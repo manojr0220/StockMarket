@@ -139,3 +139,10 @@
 .stock-detail-content {
   padding: 24px;
 }
+.loader {
+  margin-top:70;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items: center;
+}

@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "../../Redux/Store/store";
 import { fetchStockData } from "../../Redux/Slice/stock";
 import Button from "../../UIkit/Button/Button";
 import NavBar from "../navbar/Navbar";
+import SvgSpinner from "../../Icon/SvgSpinner";
 
 interface Stock {
   symbol: string;
@@ -39,8 +40,7 @@ export default function StockDashboard() {
     data: stockData,
     isLoading,
     isError,
-  } = useSelector((state: RootState) => state.NewchatData);
-  console.log(stockData, "stockDatastockData");
+  } = useSelector((state: RootState) => state.NewchatData); 
   const topGainers = stockData
     ?.filter((stock: Stock) => stock.percentChange > 0)
     ?.sort((a: Stock, b: Stock) => b.percentChange - a.percentChange)
@@ -67,94 +67,100 @@ export default function StockDashboard() {
   return (
     <>
       <NavBar />
-      <div className="dashboard-container">
-        <div className="dashboard-header">
-          <h1>Stock Recommendations</h1>
-          <p>Top performing and declining stocks for today</p>
+      {stockData.length === 0 ? (
+        <div className="loader" style={{ width: window.innerWidth }}>
+          <SvgSpinner width={62} height={62} />
         </div>
+      ) : (
+        <div className="dashboard-container">
+          <div className="dashboard-header">
+            <h1>Stock Recommendations</h1>
+            <p>Top performing and declining stocks for today</p>
+          </div>
 
-        <div className="search-container">
-          <Search className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search for a stock by name..."
-            className="search-input"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="search-container">
+            <Search className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search for a stock by name..."
+              className="search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {searchQuery && searchResults.length > 0 ? (
+            <div className="search-results">
+              <h2>Search Results</h2>
+              <div className="stock-grid">
+                {searchResults.map((stock: any) => (
+                  <StockCard
+                    key={stock.symbol}
+                    stock={stock}
+                    onClick={() => handleStockSelect(stock)}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : searchQuery ? (
+            <div className="no-results">
+              <p>No stocks found matching "{searchQuery}"</p>
+            </div>
+          ) : (
+            <div className="tabs-container">
+              <div className="tabs-header">
+                <Button
+                  width={150}
+                  disabled={activeTab === "gainers"}
+                  labelName={" Top Gainers"}
+                  onClick={() => setActiveTab("gainers")}
+                ></Button>
+                <Button
+                  width={150}
+                  disabled={activeTab !== "gainers"}
+                  labelName={"Top Losers"}
+                  onClick={() => setActiveTab("losers")}
+                ></Button>
+              </div>
+              <div className="tab-content">
+                {activeTab === "gainers" ? (
+                  <div className="stock-grid">
+                    {topGainers.map((stock: any) => (
+                      <StockCard
+                        key={stock.symbol}
+                        stock={stock}
+                        onClick={() => handleStockSelect(stock)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="stock-grid">
+                    {topLosers.map((stock) => (
+                      <StockCard
+                        key={stock.symbol}
+                        stock={stock}
+                        onClick={() => handleStockSelect(stock)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {selectedStock && (
+            <div className="stock-detail-card">
+              <div className="stock-detail-header">
+                <h2>Stock Details</h2>
+                <p>Detailed information for {selectedStock.symbol}</p>
+              </div>
+              <div className="stock-detail-content">
+                <StockDetail stock={selectedStock} />
+              </div>
+            </div>
+          )}
         </div>
-
-        {searchQuery && searchResults.length > 0 ? (
-          <div className="search-results">
-            <h2>Search Results</h2>
-            <div className="stock-grid">
-              {searchResults.map((stock: any) => (
-                <StockCard
-                  key={stock.symbol}
-                  stock={stock}
-                  onClick={() => handleStockSelect(stock)}
-                />
-              ))}
-            </div>
-          </div>
-        ) : searchQuery ? (
-          <div className="no-results">
-            <p>No stocks found matching "{searchQuery}"</p>
-          </div>
-        ) : (
-          <div className="tabs-container">
-            <div className="tabs-header">
-              <Button
-                width={150}
-                disabled={activeTab === "gainers"}
-                labelName={" Top Gainers"}
-                onClick={() => setActiveTab("gainers")}
-              ></Button>
-              <Button
-                width={150}
-                disabled={activeTab !== "gainers"}
-                labelName={"Top Losers"}
-                onClick={() => setActiveTab("losers")}
-              ></Button>
-            </div>
-            <div className="tab-content">
-              {activeTab === "gainers" ? (
-                <div className="stock-grid">
-                  {topGainers.map((stock: any) => (
-                    <StockCard
-                      key={stock.symbol}
-                      stock={stock}
-                      onClick={() => handleStockSelect(stock)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="stock-grid">
-                  {topLosers.map((stock) => (
-                    <StockCard
-                      key={stock.symbol}
-                      stock={stock}
-                      onClick={() => handleStockSelect(stock)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {selectedStock && (
-          <div className="stock-detail-card">
-            <div className="stock-detail-header">
-              <h2>Stock Details</h2>
-              <p>Detailed information for {selectedStock.symbol}</p>
-            </div>
-            <div className="stock-detail-content">
-              <StockDetail stock={selectedStock} />
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </>
   );
 }

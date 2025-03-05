@@ -17,7 +17,7 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignupScreen />} /> 
         <Route path="/StockPortfolio" element={<StockPortfolio />} />
-        <Route path="/mainscreen" element={<StockDashboard />} />
+        <Route path="/" element={<StockDashboard />} />
       </>
     )
   );

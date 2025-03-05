@@ -29,7 +29,7 @@ body {
   padding: 2rem;
 }
 
-.header {
+.stock-portfolio .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,7 +38,7 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
-.header h1 {
+.stock-portfolio .header h1 {
   font-size: 2.5rem;
   background: linear-gradient(
     90deg,
@@ -51,38 +51,38 @@ body {
   font-weight: 700;
 }
 
-.portfolio-summary {
+.stock-portfolio .portfolio-summary {
   display: flex;
   gap: 1.5rem;
 }
 
-.summary-item {
+.stock-portfolio .summary-item {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
 
-.summary-item .label {
+.stock-portfolio .summary-item .label {
   font-size: 0.9rem;
   color: #aaa;
 }
 
-.summary-item .value {
+.stock-portfolio .summary-item .value {
   font-size: 1.5rem;
   font-weight: 600;
 }
 
-.main-content {
+.stock-portfolio .main-content {
   display: block;
 }
 
-.tabs {
+.stock-portfolio .tabs {
   display: flex;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--border-color);
 }
 
-.tab-button {
+.stock-portfolio .tab-button {
   background: transparent;
   border: none;
   color: var(--text-color);
@@ -93,12 +93,12 @@ body {
   transition: all 0.3s ease;
 }
 
-.tab-button:hover {
+.stock-portfolio .tab-button:hover {
   color: var(--primary-color);
   background-color: #1d3d60 !important;
 }
 
-.tab-button.active {
+.stock-portfolio .tab-button.active {
   color: var(--primary-color);
   font-weight: 600;
 }
@@ -113,7 +113,7 @@ body {
   background-color: #1d3d60;
 }
 
-.bought-stocks-section,
+.stock-portfolio .bought-stocks-section,
 .sold-stocks-section {
   margin-bottom: 2rem;
   width: 100%;
@@ -146,35 +146,35 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.2rem;
-  width: 100%; /* Ensures it takes full width */
+  width: 100%; 
 }
 
-.stock-card {
+.stock-portfolio .stock-card {
   background-color: var(--card-background);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid var(--border-color);
+  border: 1px solid #d7d7d7;
   position: relative;
   width: 350px !important;
-  height: 240px; /* Set a fixed height for more compact cards */
+  height: 240px;  
 }
 
-.stock-card:hover {
+.stock-portfolio .stock-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-.stock-card.sold {
+.stock-portfolio .stock-card.sold {
   border-left: 4px solid var(--secondary-color);
 }
 
-.stock-card:not(.sold) {
+.stock-portfolio .stock-card:not(.sold) {
   border-left: 4px solid var(--primary-color);
 }
 
-.stock-header {
+.stock-portfolio .stock-header {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -188,23 +188,23 @@ body {
   align-items: flex-start;
 }
 
-.stock-symbol {
+.stock-portfolio .stock-symbol {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.3rem;
 }
 
-.stock-company {
+.stock-portfolio .stock-company {
   font-size: 0.9rem;
   color: #aaa;
 }
 
-.stock-details {
+.stock-portfolio .stock-details {
   padding: 0.8rem;
   color: #000 !important;
 }
 
-.detail-row {
+.stock-portfolio .detail-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
@@ -212,15 +212,15 @@ body {
   color: #000 !important;
 }
 
-.detail-label {
+.stock-portfolio .detail-label {
   color: #aaa;
 }
 
-.detail-value {
+.stock-portfolio .detail-value {
   font-weight: 600;
 }
 
-.stock-footer {
+.stock-portfolio .stock-footer {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -232,23 +232,23 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-.profit-loss {
+.stock-portfolio .profit-loss {
   font-weight: 700;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
 }
 
-.profit {
+.stock-portfolio .profit {
   background-color: rgba(46, 204, 113, 0.2);
   color: var(--profit-color);
 }
 
-.loss {
+.stock-portfolio .loss {
   background-color: rgba(231, 76, 60, 0.2);
   color: var(--loss-color);
 }
 
-.sell-button {
+.stock-portfolio .sell-button {
   background-color: var(--primary-color);
   color: #000;
   border: none;
@@ -260,11 +260,11 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.sell-button:hover {
+.stock-portfolio .sell-button:hover {
   background-color: #27ae60;
 }
 
-.sold-tag {
+.stock-portfolio .sold-tag {
   background-color: var(--secondary-color);
   color: white;
   padding: 0.5rem 1.2rem;
@@ -272,8 +272,8 @@ body {
   font-weight: 600;
 }
 
-/* Modal styles */
-.modal-overlay {
+
+.stock-portfolio .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -286,7 +286,7 @@ body {
   z-index: 1000;
 }
 
-.sell-modal {
+.stock-portfolio .sell-modal {
   background-color: var(--card-background);
   border-radius: 12px;
   width: 90%;
@@ -296,35 +296,35 @@ body {
   border: 1px solid var(--border-color);
 }
 
-.sell-modal h2 {
+.stock-portfolio .sell-modal h2 {
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
   text-align: center;
   color: var(--primary-color);
 }
 
-.modal-content {
+.stock-portfolio .modal-content {
   margin-bottom: 2rem;
 }
 
-.stock-info {
+.stock-portfolio .stock-info {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
   text-align: center;
 }
 
-.form-group {
+.stock-portfolio .form-group {
   margin-bottom: 1.2rem;
 }
 
-.form-group label {
+.stock-portfolio .form-group label {
   display: block;
   margin-bottom: 0.5rem;
   color: #aaa;
 }
 
-.form-group input {
+.stock-portfolio .form-group input {
   width: 100%;
   padding: 0.8rem;
   border-radius: 8px;
@@ -334,7 +334,7 @@ body {
   font-size: 1rem;
 }
 
-.total-calculation {
+.stock-portfolio .total-calculation {
   display: flex;
   justify-content: space-between;
   padding: 1rem;
@@ -343,13 +343,13 @@ body {
   margin-top: 1.5rem;
 }
 
-.total-calculation .value {
+.stock-portfolio .total-calculation .value {
   font-weight: 700;
   font-size: 1.2rem;
   color: var(--primary-color);
 }
 
-.modal-actions {
+.stock-portfolio .modal-actions {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
@@ -383,9 +383,7 @@ body {
 
 .confirm-button:hover {
   background-color: #27ae60;
-}
-
-/* Responsive styles */
+} 
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
@@ -412,6 +410,12 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.2rem;
-    width: 100%; /* Ensures it takes full width */
+    width: 100%;  
   }
+}
+.nodata {
+  margin-top:70;
+  height:10vh;
+  display:flex; 
+  align-items: center;
 }

@@ -1,148 +1,263 @@
 .stock-detail {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-  
-  .stock-detail-header-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-  
-  .stock-detail-symbol {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-    display: flex;
-    align-items: center;
-  }
-  
-  .stock-detail-name {
-    font-size: 16px;
-    color: var(--text-secondary);
-    margin-left: 8px;
-    font-weight: 400;
-  }
-  
-  .stock-detail-price-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  
-  .stock-detail-current-price {
-    font-size: 24px;
-    font-weight: 600;
-  }
-  
-  .stock-detail-change {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-  }
-  
-  .stock-detail-change.positive {
-    color: var(--positive-color);
-  }
-  
-  .stock-detail-change.negative {
-    color: var(--negative-color);
-  }
-  
-  .stock-chart-container {
-    width: 100%;
-    height: 300px;
-    background-color: var(--card-background);
-    border-radius: 8px;
-    padding: 16px;
-    border: 1px solid var(--border-color);
-  }
-  
-  .stock-chart {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .stock-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .stock-table th,
-  .stock-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  .stock-table th {
-    background-color: rgba(42, 82, 190, 0.05);
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-  
-  .stock-table tr:last-child td {
-    border-bottom: none;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stock-detail-header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stock-detail-symbol {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+}
+
+.stock-detail-name {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+.stock-detail-price-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stock-detail-current-price {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.stock-detail-change {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.stock-detail-change.positive {
+  color: var(--positive-color);
+}
+
+.stock-detail-change.negative {
+  color: var(--negative-color);
+}
+
+.stock-chart-container {
+  width: 100%;
+  height: 300px;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.stock-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stock-table th,
+.stock-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stock-table th {
+  background-color: rgba(42, 82, 190, 0.05);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stock-table tr:last-child td {
+  border-bottom: none;
+}
+
+.stock-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
   .stock-detail-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  
-  @media (min-width: 768px) {
-    .stock-detail-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  
-  .stock-overview h3,
-  .stock-statistics h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 12px 0;
-    color: rgb(29, 61, 96);
-  }
-  
-  .stock-overview p {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--text-secondary);
-    margin: 0;
-  }
-  
-  .statistics-grid {
-    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
   }
-  
-  .statistic-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .statistic-label {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin: 0;
-  }
-  
-  .statistic-value {
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0;
-  }
-  .heading {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-  }
-  
+}
+
+.stock-overview h3,
+.stock-statistics h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: rgb(29, 61, 96);
+}
+
+.stock-overview p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.statistic-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statistic-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.statistic-value {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+.heading {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-overlay .sell-modal {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+}
+
+.modal-overlay .sell-modal h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+.modal-overlay .modal-content {
+  margin-bottom: 2rem;
+}
+
+.modal-overlay .stock-info {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.modal-overlay .form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.modal-overlay .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #aaa;
+}
+
+.modal-overlay .form-group input {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: #1a1a1a;
+  color: white;
+  font-size: 1rem;
+}
+
+.modal-overlay .total-calculation {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: rgba(46, 204, 113, 0.1);
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.modal-overlay .total-calculation .value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cancel-button,
+.confirm-button {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: white;
+}
+
+.confirm-button {
+  background-color: var(--primary-color);
+  border: none;
+  color: black;
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.confirm-button:hover {
+  background-color: #27ae60;
+}
+.modal-overlay input {
+  height: 40px;
+  padding-left: 5px;
+}

@@ -29,6 +29,7 @@
   display: flex;
   margin: 0;
   padding: 0;
+  margin-left: 100px;
 }
 
 .navbar-links ul li {
@@ -36,7 +37,7 @@
 }
 
 .navbar-links ul li a {
-  color: #fff;
+  color: #fff !important;
   text-decoration: none;
   font-size: 1rem;
   padding: 10px;
@@ -46,7 +47,7 @@
 }
 
 .navbar-links ul li a:hover {
-  color: #2ecc71;
+  color: #2ecc71 !important;
 }
 
 .navbar-user {
@@ -74,6 +75,7 @@
 .user-info {
   display: flex;
   align-items: center;
+  margin-right: 20px;
 }
 
 .user-avatar img {
@@ -143,4 +145,9 @@
   .navbar-links ul li a {
     font-size: 1.1rem;
   }
+}
+.nav-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }

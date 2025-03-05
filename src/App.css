@@ -41,4 +41,9 @@ input {
 }
 a:hover {
   text-decoration: none !important;
+  color: #1d3d60 !important;
+}
+a {
+  text-decoration: none !important;
+  color: #1d3d60 !important;
 }

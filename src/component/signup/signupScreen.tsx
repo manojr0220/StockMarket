@@ -3,12 +3,8 @@ import "./SignupScreen.css";
 import Logo from "../../UIkit/Logo/logo";
 import { useNavigate } from "react-router-dom";
 import AWS from "aws-sdk";
-import CryptoJS from "crypto-js";
-import {
-  CognitoUserPool,
-  CognitoUser,
-  CognitoUserAttribute,
-} from "amazon-cognito-identity-js";
+import CryptoJS from "crypto-js"; 
+import Button from "../../UIkit/Button/Button";
 interface FormData {
   username: string;
   email: string;
@@ -33,10 +29,14 @@ const poolData = {
   UserPoolId: "eu-north-1_NNtm4CJTL",
   ClientId: "3kuu9kdf71sj1r816q436ajp54",
   clientScreate: "jr0h6e21q8l4pgnd7urogvmlclb1o128b6idmiu2vauce0kfn16",
+  screatekey: "OQy4FmJsnrIPGV/fcHztAYDbalV4BSYhb1snaU4G",
   AWS_REGION: "eu-north-1",
+  accesskey: "AKIA2MNVLRRNJ2TIQ3JS",
 };
 
 AWS.config.update({
+  accessKeyId: poolData.accesskey,
+  secretAccessKey: poolData.screatekey,
   region: poolData.AWS_REGION,
 });
 
@@ -148,17 +148,9 @@ const SignupScreen: React.FC = () => {
         { Name: "custom:aadhar", Value: String(aadhar) },
       ],
     };
-    const param = {
-      UserPoolId: poolData.UserPoolId,
-      Username: username,
-    };
     try {
-      const result = await cognito
-        .signUp(params)
-        .promise()
-        .then(() => {
-          cognito.adminConfirmSignUp(param).promise();
-        });
+      await cognito.signUp(params).promise();
+      await confirmUserAdmin(username);
       setSuccessMessage(
         "Registration successful! Check your email for the confirmation code."
       );
@@ -180,6 +172,19 @@ const SignupScreen: React.FC = () => {
     }
   };
 
+  const confirmUserAdmin = async (username: string) => {
+    const param = {
+      UserPoolId: poolData.UserPoolId,
+      Username: username,
+    };
+
+    try {
+      const result = await cognito.adminConfirmSignUp(param).promise();
+      console.log("User confirmed:", result);
+    } catch (error: any) {
+      console.error("Admin confirmation failed:", error.message);
+    }
+  };
   return (
     <div className="signup-container">
       <div className="logo">
@@ -257,10 +262,21 @@ const SignupScreen: React.FC = () => {
         {errors.cnfm_password && (
           <span className="error">{errors.cnfm_password}</span>
         )}
-        <button type="submit" className="signup-button" disabled={loading}>
-          Sign Up
-        </button>
 
+        <Button
+          type="submit"
+          labelName={"Sign up"}
+          color={"#fff"}
+          width={328}
+          disabled={loading}
+        ></Button>
+        <div className="auth-text">
+          Already have an account?{" "}
+          <a className="forgot-signup-link" href={"/login"}>
+            {" "}
+            Log in
+          </a>
+        </div>
         {errors.general && <p className="error">{errors.general}</p>}
         {successMessage && <p className="success-message">{successMessage}</p>}
       </form>

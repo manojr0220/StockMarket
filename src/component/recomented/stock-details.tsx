@@ -1,9 +1,11 @@
 "use client";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import "./stock-details.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "../../UIkit/Button/Button";
+import { isTokenExpired } from "../../UIkit/accessTokenVerify/accesstokenverify";
 import { updateStockStatus } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 interface Stock {
   symbol: string;
@@ -22,7 +24,10 @@ interface StockDetailProps {
 
 export default function StockDetail({ stock }: StockDetailProps) {
   const isPositive = stock.percentChange > 0;
+  const navigate = useNavigate();
   const chartRef = useRef<HTMLCanvasElement>(null);
+  const [sellQuantity, setSellQuantity] = useState(1);
+  const [isSellModalOpen, setIsSellModalOpen] = useState(false);
 
   // Mock data for the chart
   const chartData = Array.from({ length: 30 }, (_, i) => {
@@ -40,13 +45,29 @@ export default function StockDetail({ stock }: StockDetailProps) {
     };
   });
   const handlebuy = (val: any) => {
+    const valid = isTokenExpired(localStorage.getItem("token"));
+    if (valid) {
+      navigate('/login')
+    } else {
+      setIsSellModalOpen(true); 
+    }
+   
+  };
+  const handlebuyStock = (val?: any) => {
     updateStockStatus(
-      "manojr9944@gmail.com",
-      val.symbol,
+      localStorage.getItem("mail") || "",
+      val?.symbol,
       "Buy",
-      val.price.toLocaleString()
+      Math.round(Number(stock?.price)),
+      sellQuantity
     );
   };
+  const closebuyModal = () => {
+    setIsSellModalOpen(false);
+  };
+  {
+    console.log(isSellModalOpen, "isSellModalOpenisSellModalOpen", stock);
+  }
   useEffect(() => {
     if (chartRef.current) {
       const ctx = chartRef.current.getContext("2d");
@@ -146,7 +167,7 @@ export default function StockDetail({ stock }: StockDetailProps) {
             <div>
               <Button
                 labelName={"Buy"}
-                onClick={()=>handlebuy(stock)}
+                onClick={() => handlebuy(stock)}
                 width={100}
               ></Button>
             </div>
@@ -239,6 +260,64 @@ export default function StockDetail({ stock }: StockDetailProps) {
           </div>
         </div>
       </div>
+
+      {isSellModalOpen && stock && (
+        <div className="modal-overlay">
+          <div className="sell-modal">
+            <h2>Buy Stock</h2>
+            <div className="modal-content">
+              <div className="stock-info">
+                <div className="stock-symbol">{stock?.symbol}</div>
+                <div className="stock-company">{stock?.name}</div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="currentPrice">Current Price ($):</label>
+                <input
+                  type="number"
+                  id="currentPrice"
+                  readOnly
+                  value={stock?.price}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="quantity">Quantity (Max: {10}):</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  value={sellQuantity}
+                  onChange={(e) =>
+                    setSellQuantity(Number.parseInt(e.target.value))
+                  }
+                  min="1"
+                  max={10}
+                />
+              </div>
+
+              <div className="total-calculation">
+                <span className="label">Total Sale Value:</span>
+                <span className="value">
+                  ${(stock?.price * sellQuantity).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <Button
+                labelName={"cancel"}
+                color={"#1d3d60"}
+                backgroundColor={"#fff"}
+                onClick={closebuyModal}
+              ></Button>
+              <Button
+                labelName={"Buy"}
+                onClick={() => handlebuyStock(stock || "")}
+              ></Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

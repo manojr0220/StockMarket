@@ -1,18 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Navbar.css";
+import { isTokenExpired } from "../../UIkit/accessTokenVerify/accesstokenverify";
+import AvatarWithInitials from "../../UIkit/AvatarWithInitials/AvatarWithInitials";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
   const [mobileMenu, setMobileMenu] = useState(false); // Mobile menu toggle state
-
+  const navigate = useNavigate();
   // Handle login functionality
   const handleLogin = () => {
-    setIsLoggedIn(true);
+    navigate("/login");
   };
-
+  useEffect(() => {
+    const valid = isTokenExpired(localStorage.getItem("token"));
+    if (valid) {
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
+  });
   // Handle logout functionality
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    localStorage.clear();
+    navigate("/login");
   };
 
   // Toggle mobile menu
@@ -23,24 +34,21 @@ const NavBar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div className="navbar-logo">LezDo TechMed</div>
-
-        {/* Navigation Links */}
-        <div className={`navbar-links ${mobileMenu ? "active" : ""}`}>
-          <ul>
-            <li>
-              <a href="/">Home</a>
-            </li>
-            <li>
-              <a href="/news">Market News</a>
-            </li>
-            <li>
-              <a href="/portfolio">My Portfolio</a>
-            </li>
-            <li>
-              <a href="/stocks">Stocks</a>
-            </li>
-          </ul>
+        <div className="nav-head">
+          <div className="navbar-logo">LezDo TechMed</div>
+          {/* Navigation Links */}
+          <div className={`navbar-links ${mobileMenu ? "active" : ""}`}>
+            <ul>
+              <li>
+                <a href="/">Home</a>
+              </li>
+              {isLoggedIn && (
+                <li>
+                  <a href="/StockPortfolio">My Portfolio</a>
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
 
         {/* User or Login Button */}
@@ -50,10 +58,12 @@ const NavBar = () => {
               Login
             </button>
           ) : (
-            <div className="user-info">
-              <div className="user-avatar" onClick={handleLogout}>
-                <img src="/path/to/avatar.png" alt="Avatar" />
-              </div>
+            <div className="user-info" onClick={handleLogout}>
+              <AvatarWithInitials
+                name={localStorage.getItem("username")?.toString()}
+                width="50px"
+                height="50px"
+              />
             </div>
           )}
         </div>

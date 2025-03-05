@@ -11,8 +11,7 @@
   color: #1d3d60;
   margin-bottom: 40px;
 }
-.login-form {
-  padding: 20px;
+.login-form { 
   border-radius: 8px;
   width: 100%;
   width: 350px;
@@ -76,4 +75,14 @@ button:hover {
   display: flex;
   margin: 5px 0 0 5px;
   margin-bottom: 20px;
+  margin-left: 10px;
+}
+.auth-text {
+  display: flex;
+  justify-content: start; 
+  margin-top: 5px;
+  margin-left: 10px;
+}
+.forgot-signup-link{
+  margin-left: 2.5px;
 }

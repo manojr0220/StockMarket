@@ -1,14 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { GetStockStatus } from "../../api/api";
 
 interface StockData {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  percentChange: number;
-  volume: number;
-  marketCap: number;
-  description: string;
+  Price: number;
+  Quantity: number;
+  StockID: string;
+  Category: string;
+  Email: string;
 }
 
 interface StockState {
@@ -47,42 +45,41 @@ function transformStockData(apiData: any) {
 }
 
 // **Fetch Stock Data Thunk**
-export const fetchStockData = createAsyncThunk("stock/fetchData", async () => {
-  const response = await fetch(
-    "https://script.google.com/macros/s/AKfycbyE3x3exGpNQaIADJ8L8Vu6X9OyoHiU3uhGTgTKuKVsNT-X-C68JyiWsmkAj7ffqTT1/exec"
-  );
-  const data = await response.json();
-
-  if (Array.isArray(data)) {
-    return data.map(transformStockData);
-  } else {
-    throw new Error("Invalid API response format");
+export const fetchBuyandSellStockData = createAsyncThunk<StockData[], string>(
+  "stock/fetchStockData",
+  async (email, { rejectWithValue }) => {
+    try {
+      const mail = localStorage.getItem("mail");
+      const response = await GetStockStatus(mail || "");
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
-});
+);
 
 // **Stock Data Slice**
-const stockSlice = createSlice({
+const BUYandSellstockSlice = createSlice({
   name: "stock",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchStockData.pending, (state) => {
+      .addCase(fetchBuyandSellStockData.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(
-        fetchStockData.fulfilled,
+        fetchBuyandSellStockData.fulfilled,
         (state, action: PayloadAction<StockData[]>) => {
-          console.log(action.payload,'action.payload')
           state.isLoading = false;
           state.data = action.payload;
         }
       )
-      .addCase(fetchStockData.rejected, (state) => {
+      .addCase(fetchBuyandSellStockData.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       });
   },
 });
 
-export default stockSlice.reducer;
+export default BUYandSellstockSlice.reducer;

@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Stocksscreen.css";
 import NavBar from "../navbar/Navbar";
+import { GetStockStatus, updateStockStatus } from "../../api/api";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../Redux/Store/store";
+import { fetchBuyandSellStockData } from "../../Redux/Slice/BuyandSell";
+import { fetchStockData } from "../../Redux/Slice/stock";
+import Button from "../../UIkit/Button/Button";
 
 // Types
 interface Stock {
@@ -18,45 +24,32 @@ interface Stock {
 }
 
 export default function StockPortfolio() {
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    dispatch(fetchStockData()).then(() => {
+      dispatch(fetchBuyandSellStockData(""));
+    });
+  }, [dispatch]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(fetchStockData());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [dispatch]);
+  const {
+    data: stockData,
+    isLoading,
+    isError,
+  } = useSelector((state: RootState) => state.NewchatData);
+  console.log(stockData, "stockDatastockData");
+  const { BuyandSell } = useSelector((state: RootState) => {
+    return {
+      BuyandSell: state.BuyandSell,
+    };
+  });
   // Sample data - in a real app this would come from an API
-  const [boughtStocks, setBoughtStocks] = useState<Stock[]>([
-    {
-      id: "1",
-      symbol: "AAPL",
-      companyName: "Apple Inc.",
-      purchasePrice: 150.75,
-      currentPrice: 175.25,
-      quantity: 10,
-      purchaseDate: "2023-01-15",
-    },
-    {
-      id: "2",
-      symbol: "MSFT",
-      companyName: "Microsoft Corporation",
-      purchasePrice: 245.3,
-      currentPrice: 240.15,
-      quantity: 5,
-      purchaseDate: "2023-02-20",
-    },
-    {
-      id: "3",
-      symbol: "GOOGL",
-      companyName: "Alphabet Inc.",
-      purchasePrice: 2250.8,
-      currentPrice: 2400.5,
-      quantity: 2,
-      purchaseDate: "2023-03-10",
-    },
-    {
-      id: "4",
-      symbol: "AMZN",
-      companyName: "Amazon.com Inc.",
-      purchasePrice: 3100.25,
-      currentPrice: 3250.75,
-      quantity: 3,
-      purchaseDate: "2023-04-05",
-    },
-  ]);
+  const [boughtStocks, setBoughtStocks] = useState<any>(BuyandSell);
 
   const [soldStocks, setSoldStocks] = useState<Stock[]>([
     {
@@ -83,7 +76,7 @@ export default function StockPortfolio() {
     },
   ]);
 
-  const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+  const [selectedStock, setSelectedStock] = useState<any>(null);
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
   const [sellQuantity, setSellQuantity] = useState(1);
   const [sellPrice, setSellPrice] = useState(0);
@@ -91,7 +84,8 @@ export default function StockPortfolio() {
 
   // Calculate profit/loss
   const calculateProfitLoss = (purchasePrice: number, currentPrice: number) => {
-    return ((currentPrice - purchasePrice) / purchasePrice) * 100;
+    console.log(((currentPrice - purchasePrice) / purchasePrice) * 100 ,'cccc',purchasePrice,currentPrice,currenttabdata())
+    return ((currentPrice - purchasePrice) / purchasePrice) * 100 || 0;
   };
 
   // Open sell modal
@@ -147,6 +141,42 @@ export default function StockPortfolio() {
     closeSellModal();
   };
 
+  //   {
+  //     "Price": 66,
+  //     "Quantity": 2,
+  //     "StockID": "BURNPUR",
+  //     "Category": "Buy",
+  //     "Email": "man@yopmail.com"
+  // },
+  // {
+  //     "Price": 776,
+  //     "Quantity": 3,
+  //     "StockID": "MANINDS",
+  //     "Category": "Buy",
+  //     "Email": "man@yopmail.com"
+  // }
+
+  const currenttabdata = () => {
+    if (activeTab === "sold") {
+      return BuyandSell?.data?.filter((val: any) => val?.Category === "Sold");
+    } else {
+      return BuyandSell?.data?.filter((val) => val?.Category === "Buy");
+    }
+  };
+
+  const Getrelatedstock = (vals: any) => {
+    const data = stockData.filter((val) => val?.symbol === vals)[0];
+    return data;
+  };
+  const handlesellStock = (val?: any) => {
+    updateStockStatus(
+      localStorage.getItem("mail") || "",
+      selectedStock?.StockID,
+      "Sold",
+      Math.round(Number(selectedStock?.Price)),
+      sellQuantity
+    );
+  };
   return (
     <>
       <NavBar />
@@ -156,11 +186,11 @@ export default function StockPortfolio() {
           <div className="portfolio-summary">
             <div className="summary-item">
               <span className="label">Total Stocks:</span>
-              <span className="value">{boughtStocks.length}</span>
+              <span className="value">{BuyandSell?.data?.length}</span>
             </div>
             <div className="summary-item">
               <span className="label">Sold Stocks:</span>
-              <span className="value">{soldStocks.length}</span>
+              <span className="value">{BuyandSell?.data?.filter((val: any) => val?.Category === "Sold").length}</span>
             </div>
           </div>
         </header>
@@ -184,56 +214,76 @@ export default function StockPortfolio() {
           {activeTab === "bought" && (
             <section className="bought-stocks-section">
               <div className="stocks-grid">
-                {boughtStocks.map((stock) => (
-                  <div key={stock.id} className="stock-card">
-                    <div className="stock-header">
-                      <div className="stock-symbol">{stock.symbol}</div>
-                      <div className="stock-company">{stock.companyName}</div>
-                    </div>
-                    <div className="stock-details">
-                      <div className="detail-row">
-                        <span className="detail-label">Purchase Price:</span>
-                        <span className="detail-value">
-                          ${stock.purchasePrice.toFixed(2)}
-                        </span>
+                {currenttabdata().length !== 0 ? (
+                  <>
+                    {currenttabdata()?.map((stock: any) => (
+                      <div key={stock.StockID} className="stock-card">
+                        <div className="stock-header">
+                          <div className="stock-symbol">{stock.StockID}</div>
+                          <div className="stock-company">
+                            {Getrelatedstock(stock.StockID).name}
+                          </div>
+                        </div>
+                        <div className="stock-details">
+                          <div className="detail-row">
+                            <span className="detail-label">
+                              Purchase Price:
+                            </span>
+                            <span className="detail-value">
+                              ${stock.Price.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Current Price:</span>
+                            <span className="detail-value">
+                              $
+                              {(
+                                Getrelatedstock(stock.StockID).price *
+                                stock.Quantity
+                              ).toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Quantity:</span>
+                            <span className="detail-value">
+                              {stock.Quantity}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="stock-footer">
+                          <div
+                            className={`profit-loss ${
+                              calculateProfitLoss(
+                                stock.Price,
+                                Getrelatedstock(stock.StockID).price *
+                                  stock.Quantity
+                              ) >= 0
+                                ? "profit"
+                                : "loss"
+                            }`}
+                          >
+                            {calculateProfitLoss(
+                              stock.Price,
+                              Getrelatedstock(stock.StockID).price *
+                                stock.Quantity
+                            ).toFixed(2)}
+                            %
+                          </div>
+                          <button
+                            className="sell-button"
+                            onClick={() => openSellModal(stock)}
+                          >
+                            Sell
+                          </button>
+                        </div>
                       </div>
-                      <div className="detail-row">
-                        <span className="detail-label">Current Price:</span>
-                        <span className="detail-value">
-                          ${stock.currentPrice.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">Quantity:</span>
-                        <span className="detail-value">{stock.quantity}</span>
-                      </div>
-                    </div>
-                    <div className="stock-footer">
-                      <div
-                        className={`profit-loss ${
-                          calculateProfitLoss(
-                            stock.purchasePrice,
-                            stock.currentPrice
-                          ) >= 0
-                            ? "profit"
-                            : "loss"
-                        }`}
-                      >
-                        {calculateProfitLoss(
-                          stock.purchasePrice,
-                          stock.currentPrice
-                        ).toFixed(2)}
-                        %
-                      </div>
-                      <button
-                        className="sell-button"
-                        onClick={() => openSellModal(stock)}
-                      >
-                        Sell
-                      </button>
-                    </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="nodata" style={{ width: window.innerWidth }}>
+                    No Data found
                   </div>
-                ))}
+                )}
               </div>
             </section>
           )}
@@ -241,57 +291,59 @@ export default function StockPortfolio() {
           {activeTab === "sold" && (
             <section className="sold-stocks-section">
               <div className="stocks-grid">
-                {soldStocks.map((stock) => (
-                  <div key={stock.id} className="stock-card sold">
-                    <div className="stock-header">
-                      <div className="stock-symbol">{stock.symbol}</div>
-                      <div className="stock-company">{stock.companyName}</div>
-                    </div>
-                    <div className="stock-details">
-                      <div className="detail-row">
-                        <span className="detail-label">Purchase Price:</span>
-                        <span className="detail-value">
-                          ${stock.purchasePrice.toFixed(2)}
-                        </span>
+                {currenttabdata().length !== 0 ? (
+                  <>
+                    {currenttabdata()?.map((stock: any) => (
+                      <div key={stock.StockID} className="stock-card sold">
+                        <div className="stock-header">
+                          <div className="stock-symbol">{stock.StockID}</div>
+                          <div className="stock-company">
+                            {Getrelatedstock(stock.StockID).name}
+                          </div>
+                        </div>
+                        <div className="stock-details">
+                          <div className="detail-row">
+                            <span className="detail-label">Sold Price:</span>
+                            <span className="detail-value">
+                              ${stock.Price?.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Quantity:</span>
+                            <span className="detail-value">
+                              {stock.Quantity}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="stock-footer">
+                          <div
+                            className={`profit-loss ${
+                              stock.Price &&
+                              calculateProfitLoss( 
+                                stock.Price,
+                                Getrelatedstock(stock.StockID).price *
+                                stock.Quantity
+                              ) >= 0
+                                ? "profit"
+                                : "loss"
+                            }`}
+                          >
+                            {stock.Price &&
+                              calculateProfitLoss( 
+                                stock.Price,
+                                Getrelatedstock(stock.StockID).price *
+                                stock.Quantity
+                              ).toFixed(2)}
+                            %
+                          </div>
+                          <div className="sold-tag">SOLD</div>
+                        </div>
                       </div>
-                      <div className="detail-row">
-                        <span className="detail-label">Sold Price:</span>
-                        <span className="detail-value">
-                          ${stock.soldPrice?.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">Quantity:</span>
-                        <span className="detail-value">{stock.quantity}</span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">Sold Date:</span>
-                        <span className="detail-value">{stock.soldDate}</span>
-                      </div>
-                    </div>
-                    <div className="stock-footer">
-                      <div
-                        className={`profit-loss ${
-                          stock.soldPrice &&
-                          calculateProfitLoss(
-                            stock.purchasePrice,
-                            stock.soldPrice
-                          ) >= 0
-                            ? "profit"
-                            : "loss"
-                        }`}
-                      >
-                        {stock.soldPrice &&
-                          calculateProfitLoss(
-                            stock.purchasePrice,
-                            stock.soldPrice
-                          ).toFixed(2)}
-                        %
-                      </div>
-                      <div className="sold-tag">SOLD</div>
-                    </div>
-                  </div>
-                ))}
+                    ))}
+                  </>
+                ) : (
+                  <div>No Data found</div>
+                )}
               </div>
             </section>
           )}
@@ -303,29 +355,22 @@ export default function StockPortfolio() {
               <h2>Sell Stock</h2>
               <div className="modal-content">
                 <div className="stock-info">
-                  <div className="stock-symbol">{selectedStock.symbol}</div>
-                  <div className="stock-company">
-                    {selectedStock.companyName}
-                  </div>
+                  <div className="stock-symbol">{selectedStock.StockID}</div>
+                  <div className="stock-company">{selectedStock.Price}</div>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="currentPrice">Current Price ($):</label>
+                  <label htmlFor="currentPrice">Current Price:</label>
                   <input
                     type="number"
                     id="currentPrice"
-                    value={sellPrice}
-                    onChange={(e) =>
-                      setSellPrice(Number.parseFloat(e.target.value))
-                    }
-                    min="0.01"
-                    step="0.01"
+                    value={Getrelatedstock(selectedStock.StockID).price}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="quantity">
-                    Quantity (Max: {selectedStock.quantity}):
+                    Quantity (Max: {selectedStock.Quantity}):
                   </label>
                   <input
                     type="number"
@@ -335,25 +380,32 @@ export default function StockPortfolio() {
                       setSellQuantity(Number.parseInt(e.target.value))
                     }
                     min="1"
-                    max={selectedStock.quantity}
+                    max={selectedStock.Quantity}
                   />
                 </div>
 
                 <div className="total-calculation">
                   <span className="label">Total Sale Value:</span>
                   <span className="value">
-                    ${(sellPrice * sellQuantity).toFixed(2)}
+                    {(
+                      Getrelatedstock(selectedStock.StockID).price *
+                      sellQuantity
+                    ).toFixed(2)}
                   </span>
                 </div>
               </div>
 
               <div className="modal-actions">
-                <button className="cancel-button" onClick={closeSellModal}>
-                  Cancel
-                </button>
-                <button className="confirm-button" onClick={handleSellStock}>
-                  Confirm Sale
-                </button>
+                <Button
+                  labelName={"Cancel"}
+                  color={"#1d3d60"}
+                  backgroundColor={"#fff"}
+                  onClick={closeSellModal}
+                ></Button>
+                <Button
+                  labelName={"sale"}
+                  onClick={() => handlesellStock(selectedStock.StockID)}
+                ></Button>
               </div>
             </div>
           </div>
