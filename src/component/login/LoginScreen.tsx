@@ -1,9 +1,11 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import "./LoginScreen.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../UIkit/Logo/logo";
 import Button from "../../UIkit/Button/Button";
-import { COLORS } from "../../UIkit/color/color";
+import crypto from "crypto";
+import AWS from "aws-sdk";
 
 interface FormData {
   username: string;
@@ -14,8 +16,16 @@ interface Errors {
   username?: string;
   password?: string;
 }
-
+const poolData = {
+  UserPoolId: "eu-north-1_NNtm4CJTL",
+  ClientId: "3kuu9kdf71sj1r816q436ajp54",
+  clientScreate: "jr0h6e21q8l4pgnd7urogvmlclb1o128b6idmiu2vauce0kfn16",
+  AWS_REGION: "eu-north-1",
+};
 const LoginScreen: React.FC = () => {
+  const navigation = useNavigate();
+  AWS.config.update({ region: poolData.AWS_REGION });
+  const cognito = new AWS.CognitoIdentityServiceProvider();
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
@@ -56,30 +66,50 @@ const LoginScreen: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const calculateSecretHash = async (username: string) => {
+    const secret = poolData.clientScreate;
+    const message = new TextEncoder().encode(username + poolData.ClientId);
+    const key = await window.crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    const hashBuffer = await window.crypto.subtle.sign("HMAC", key, message);
+    return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+  };
+  
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTouched({ username: true, password: true });
 
     if (validateForm()) {
+      const secretHash = calculateSecretHash(formData.username);
       try {
-        const response = await axios.post(
-          "http://127.0.0.1:8000/auth/api/login/",
-          formData,
-          {
-            headers: {
-              "Content-Type": "application/json",
+        const result = await cognito
+          .initiateAuth({
+            AuthFlow: "USER_PASSWORD_AUTH",
+            ClientId: poolData.ClientId,
+            AuthParameters: {
+              USERNAME: formData.username,
+              PASSWORD: formData.password,
             },
-          }
+          })
+          .promise();
+
+        console.log("Login successful!", result);
+        localStorage.setItem(
+          "token",
+          result.AuthenticationResult?.IdToken || ""
         );
 
-        localStorage.setItem("token", response.data.access);
-        localStorage.setItem("is_admin", response.data.user.is_admin);
-        window.location.href = "/Dashboard";
-
         alert("Login successful!");
+        navigation("/dashboard");
       } catch (error: any) {
-        console.error("Login Error:", error.response?.data || error.message);
-        alert("Login failed. Please check your credentials.");
+        console.error("Login failed:", error.message);
+        alert("Login failed: " + error.message);
       }
     }
   };
@@ -93,8 +123,7 @@ const LoginScreen: React.FC = () => {
         <div
           className="input-group"
           style={{
-            marginBottom:
-              touched.username && errors.username ? "0px" : "20px",
+            marginBottom: touched.username && errors.username ? "0px" : "20px",
           }}
         >
           {formData.username && <label className="focused">Email</label>}
@@ -112,8 +141,7 @@ const LoginScreen: React.FC = () => {
         <div
           className="input-group"
           style={{
-            marginBottom:
-              touched.password && errors.password ? "0px" : "20px",
+            marginBottom: touched.password && errors.password ? "0px" : "20px",
           }}
         >
           {formData.password && <label className="focused">Password</label>}
@@ -128,11 +156,7 @@ const LoginScreen: React.FC = () => {
         {touched.password && errors.password && (
           <span className="error">{errors.password}</span>
         )}
-        <Button
-          labelName={"Login"} 
-          onClick={handleSubmit}
-          width={"90px"}
-        />
+        <Button labelName={"Login"} onClick={handleSubmit} width={"90px"} />
       </form>
     </div>
   );

@@ -1,0 +1,417 @@
+:root {
+  --primary-color: #2ecc71;
+  --secondary-color: rgb(29, 61, 96);
+  --text-color: #000;
+  --background-color: #fff;
+  --card-background: #fff;
+  --border-color: #545454;
+  --profit-color: #2ecc71;
+  --loss-color: #e74c3c;
+  --hover-color: #1a1a1a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.stock-portfolio {
+  margin-top: 70px !important;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+
+.portfolio-summary {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.summary-item .label {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.summary-item .value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.main-content {
+  display: block;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-button {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+  color: var(--primary-color);
+  background-color: #1d3d60 !important;
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.tab-button.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #1d3d60;
+}
+
+.bought-stocks-section,
+.sold-stocks-section {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.bought-stocks-section h2,
+.sold-stocks-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.bought-stocks-section h2::after,
+.sold-stocks-section h2::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--primary-color);
+}
+
+.sold-stocks-section h2::after {
+  background: var(--secondary-color);
+}
+
+.stocks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.2rem;
+  width: 100%; /* Ensures it takes full width */
+}
+
+.stock-card {
+  background-color: var(--card-background);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid var(--border-color);
+  position: relative;
+  width: 350px !important;
+  height: 240px; /* Set a fixed height for more compact cards */
+}
+
+.stock-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.stock-card.sold {
+  border-left: 4px solid var(--secondary-color);
+}
+
+.stock-card:not(.sold) {
+  border-left: 4px solid var(--primary-color);
+}
+
+.stock-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0.8rem;
+  background: linear-gradient(
+    to right,
+    rgba(46, 204, 113, 0.1),
+    rgba(29, 61, 96, 0.1)
+  );
+  border-bottom: 1px solid var(--border-color);
+  align-items: flex-start;
+}
+
+.stock-symbol {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.stock-company {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.stock-details {
+  padding: 0.8rem;
+  color: #000 !important;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #000 !important;
+}
+
+.detail-label {
+  color: #aaa;
+}
+
+.detail-value {
+  font-weight: 600;
+}
+
+.stock-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem; 
+  border-top: 1px solid var(--border-color);
+}
+
+.profit-loss {
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+}
+
+.profit {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: var(--profit-color);
+}
+
+.loss {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: var(--loss-color);
+}
+
+.sell-button {
+  background-color: var(--primary-color);
+  color: #000;
+  border: none;
+  width: 150px;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sell-button:hover {
+  background-color: #27ae60;
+}
+
+.sold-tag {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.sell-modal {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+}
+
+.sell-modal h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.modal-content {
+  margin-bottom: 2rem;
+}
+
+.stock-info {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #aaa;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: #1a1a1a;
+  color: white;
+  font-size: 1rem;
+}
+
+.total-calculation {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: rgba(46, 204, 113, 0.1);
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.total-calculation .value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cancel-button,
+.confirm-button {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: white;
+}
+
+.confirm-button {
+  background-color: var(--primary-color);
+  border: none;
+  color: black;
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.confirm-button:hover {
+  background-color: #27ae60;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .portfolio-summary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .stocks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 992px) {
+  .main-content {
+    display: grid;
+    align-items: start;
+  }
+  .stocks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.2rem;
+    width: 100%; /* Ensures it takes full width */
+  }
+}

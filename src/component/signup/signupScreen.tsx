@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import "./SignupScreen.css";
-import axios from "axios";
 import Logo from "../../UIkit/Logo/logo";
 import { useNavigate } from "react-router-dom";
-
+import AWS from "aws-sdk";
+import CryptoJS from "crypto-js";
+import {
+  CognitoUserPool,
+  CognitoUser,
+  CognitoUserAttribute,
+} from "amazon-cognito-identity-js";
 interface FormData {
   username: string;
   email: string;
@@ -24,8 +29,24 @@ interface Errors {
   aadhar?: string;
   general?: string;
 }
+const poolData = {
+  UserPoolId: "eu-north-1_NNtm4CJTL",
+  ClientId: "3kuu9kdf71sj1r816q436ajp54",
+  clientScreate: "jr0h6e21q8l4pgnd7urogvmlclb1o128b6idmiu2vauce0kfn16",
+  AWS_REGION: "eu-north-1",
+};
+
+AWS.config.update({
+  region: poolData.AWS_REGION,
+});
 
 const SignupScreen: React.FC = () => {
+  const computeSecretHash = (username: string) => {
+    return CryptoJS.HmacSHA256(
+      username + poolData.ClientId,
+      poolData.clientScreate
+    ).toString(CryptoJS.enc.Base64);
+  };
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     username: "",
@@ -90,40 +111,72 @@ const SignupScreen: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const cognito = new AWS.CognitoIdentityServiceProvider();
+  const formatPhoneNumber = (phone: string): string => {
+    // Ensure phone number starts with country code, e.g., "+46" for Sweden
+    if (!phone.startsWith("+")) {
+      return `+91${phone.replace(/^0+/, "")}`; // Remove leading zero if present
+    }
+    return phone;
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (validateForm()) {
-      setLoading(true);
-      setSuccessMessage("");
-      try {
-        const response = await axios.post(
-          "http://127.0.0.1:8000/auth/api/register/",
-          formData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
 
-        console.log("Response:", response.data);
-        setSuccessMessage("Registration successful!");
-        navigate("/login");
-        setFormData({
-          username: "",
-          email: "",
-          password: "",
-          cnfm_password: "",
-          mobile: "",
-          pan: "",
-          aadhar: "",
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    setSuccessMessage("");
+
+    const { username, email, password, mobile, pan, aadhar } = formData;
+    localStorage.setItem("username", username);
+    const secretHash = computeSecretHash(username);
+
+    const formattedMobile = formatPhoneNumber(mobile); // Ensure correct phone format
+
+    const params = {
+      ClientId: poolData.ClientId,
+      SecretHash: secretHash,
+      Username: username,
+      Password: password,
+      UserAttributes: [
+        { Name: "name", Value: username }, // ✅ Add name attribute
+        { Name: "email", Value: email },
+        { Name: "phone_number", Value: formattedMobile },
+        { Name: "custom:pan", Value: String(pan) },
+        { Name: "custom:aadhar", Value: String(aadhar) },
+      ],
+    };
+    const param = {
+      UserPoolId: poolData.UserPoolId,
+      Username: username,
+    };
+    try {
+      const result = await cognito
+        .signUp(params)
+        .promise()
+        .then(() => {
+          cognito.adminConfirmSignUp(param).promise();
         });
-      } catch (error: any) {
-        console.error("Error:", error.response?.data || error.message);
-        setErrors(error.response?.data || { general: "Registration failed" });
-      } finally {
-        setLoading(false);
-      }
+      setSuccessMessage(
+        "Registration successful! Check your email for the confirmation code."
+      );
+      navigate("/login");
+
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        cnfm_password: "",
+        mobile: "",
+        pan: "",
+        aadhar: "",
+      });
+    } catch (error: any) {
+      console.error("Signup failed:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 

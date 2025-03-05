@@ -11,10 +11,6 @@ export const applicationapi = axios.create({
   baseURL: "https://gxp.sense7ai.com/api",
 });
 
-export const stock = axios.create({
-  baseURL: "https://11hr8dgjma.execute-api.eu-north-1.amazonaws.com/default",
-});
-
 export const Signupapi = (
   first_name: string,
   last_name: string,
@@ -43,39 +39,48 @@ export const Signupapi = (
   );
 };
 
-export const updateStockStatus = async (
-  email?: any,
-  stockid?: any,
-  category?: any,
-  price?: any
-) => {
-  const url = "https://11hr8dgjma.execute-api.eu-north-1.amazonaws.com/default";
+const stock = axios.create({
+  baseURL: "https://11hr8dgjma.execute-api.eu-north-1.amazonaws.com/default",
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
 
+export const updateStockStatus = async (
+  email?: string,
+  stockid?: string,
+  category?: string,
+  price?: number
+) => {
   try {
-    const response = await stock.post(
-      "/UpdateStockStatus",
+    // ✅ First, send a preflight OPTIONS request
+    await fetch(
+      "https://11hr8dgjma.execute-api.eu-north-1.amazonaws.com/default/UpdateStockStatus",
       {
-        email: email,
-        stockid: stockid,
-        category: category,
-        price: price,
-      },
-      {
+        method: "OPTIONS",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
         },
       }
     );
-    if (response.status === 200) {
-      // setloder(false);
-      // notify(t("Form submitted successfully."), "success", 3000);
-      // formik.resetForm();
-    }
+
+    // ✅ Now send the actual POST request
+    const response = await fetch(
+      "https://11hr8dgjma.execute-api.eu-north-1.amazonaws.com/default/UpdateStockStatus",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      }
+    );
+
+    const data = await response.json();
+    console.log(data);
   } catch (error) {
     console.error("Error:", error);
-    // notify(t("Form failed to save."), "error", 3000);
-    // setloder(false);
   }
 };
 
