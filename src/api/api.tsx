@@ -27,8 +27,7 @@ export const updateStockStatus = async (
       }
     );
 
-    const data = await response.json();
-    console.log(data);
+    const data = await response.json(); 
   } catch (error) {
     console.error("Error:", error);
   }
@@ -51,8 +50,7 @@ export const GetStockStatus = async (email?: string) => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log("Response Data:", data);
+    const data = await response.json(); 
     return data;
   } catch (error) {
     console.error("Error:", error);

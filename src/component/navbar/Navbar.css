@@ -12,8 +12,9 @@
 
 .navbar-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between !important;
   align-items: center;
+  width: 100%;
 }
 
 .navbar-logo{

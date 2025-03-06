@@ -72,8 +72,7 @@ const stockSlice = createSlice({
       })
       .addCase(
         fetchStockData.fulfilled,
-        (state, action: PayloadAction<StockData[]>) => {
-          console.log(action.payload,'action.payload')
+        (state, action: PayloadAction<StockData[]>) => { 
           state.isLoading = false;
           state.data = action.payload;
         }

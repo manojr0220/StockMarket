@@ -1,6 +1,7 @@
 import "./button.css";
 import { alpha } from "@mui/material/styles";
-import {COLORS} from '../color/color'
+import "bootstrap/dist/css/bootstrap.min.css";
+import { COLORS } from "../color/color";
 export default function Button(props) {
   const {
     labelName,
@@ -17,11 +18,11 @@ export default function Button(props) {
       <button
         className="button-style"
         style={{
-          width,
+          width: width,
           border: disabled ? "none" : `1px solid ${COLORS.primary}`,
           backgroundColor: disabled ? backgroundColordisable : backgroundColor,
           color: color,
-          height:height
+          height: height, 
         }}
         onClick={props.onClick}
         width={width}

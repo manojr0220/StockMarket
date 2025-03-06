@@ -3,8 +3,9 @@ import "./SignupScreen.css";
 import Logo from "../../UIkit/Logo/logo";
 import { useNavigate } from "react-router-dom";
 import AWS from "aws-sdk";
-import CryptoJS from "crypto-js"; 
+import CryptoJS from "crypto-js";
 import Button from "../../UIkit/Button/Button";
+import { notify } from "../../UIkit/Toast/toast";
 interface FormData {
   username: string;
   email: string;
@@ -48,6 +49,7 @@ const SignupScreen: React.FC = () => {
     ).toString(CryptoJS.enc.Base64);
   };
   const navigate = useNavigate();
+  const [loader, setloader] = useState<any>(false);
   const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
@@ -120,55 +122,59 @@ const SignupScreen: React.FC = () => {
     return phone;
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setloader(true);
     e.preventDefault();
 
     if (!validateForm()) {
+      setloader(false);
       return;
-    }
+    } else {
+      setLoading(true);
+      setSuccessMessage("");
 
-    setLoading(true);
-    setSuccessMessage("");
+      const { username, email, password, mobile, pan, aadhar } = formData;
+      localStorage.setItem("username", username);
+      const secretHash = computeSecretHash(username);
 
-    const { username, email, password, mobile, pan, aadhar } = formData;
-    localStorage.setItem("username", username);
-    const secretHash = computeSecretHash(username);
+      const formattedMobile = formatPhoneNumber(mobile); // Ensure correct phone format
 
-    const formattedMobile = formatPhoneNumber(mobile); // Ensure correct phone format
-
-    const params = {
-      ClientId: poolData.ClientId,
-      SecretHash: secretHash,
-      Username: username,
-      Password: password,
-      UserAttributes: [
-        { Name: "name", Value: username }, // ✅ Add name attribute
-        { Name: "email", Value: email },
-        { Name: "phone_number", Value: formattedMobile },
-        { Name: "custom:pan", Value: String(pan) },
-        { Name: "custom:aadhar", Value: String(aadhar) },
-      ],
-    };
-    try {
-      await cognito.signUp(params).promise();
-      await confirmUserAdmin(username);
-      setSuccessMessage(
-        "Registration successful! Check your email for the confirmation code."
-      );
-      navigate("/login");
-
-      setFormData({
-        username: "",
-        email: "",
-        password: "",
-        cnfm_password: "",
-        mobile: "",
-        pan: "",
-        aadhar: "",
-      });
-    } catch (error: any) {
-      console.error("Signup failed:", error.message);
-    } finally {
-      setLoading(false);
+      const params = {
+        ClientId: poolData.ClientId,
+        SecretHash: secretHash,
+        Username: username,
+        Password: password,
+        UserAttributes: [
+          { Name: "name", Value: username }, // ✅ Add name attribute
+          { Name: "email", Value: email },
+          { Name: "phone_number", Value: formattedMobile },
+          { Name: "custom:pan", Value: String(pan) },
+          { Name: "custom:aadhar", Value: String(aadhar) },
+        ],
+      };
+      try {
+        await cognito.signUp(params).promise();
+        await confirmUserAdmin(username);
+        setSuccessMessage(
+          "Registration successful! Check your email for the confirmation code."
+        );
+        navigate("/login");
+        setloader(false);
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          cnfm_password: "",
+          mobile: "",
+          pan: "",
+          aadhar: "",
+        });
+      } catch (error: any) {
+        setloader(false);
+        notify(error.message, "error", 3000);
+        console.error("Signup failed:", error.message);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -180,7 +186,6 @@ const SignupScreen: React.FC = () => {
 
     try {
       const result = await cognito.adminConfirmSignUp(param).promise();
-      console.log("User confirmed:", result);
     } catch (error: any) {
       console.error("Admin confirmation failed:", error.message);
     }
@@ -262,14 +267,17 @@ const SignupScreen: React.FC = () => {
         {errors.cnfm_password && (
           <span className="error">{errors.cnfm_password}</span>
         )}
-
-        <Button
-          type="submit"
-          labelName={"Sign up"}
-          color={"#fff"}
-          width={328}
-          disabled={loading}
-        ></Button>
+        {loader ? (
+          <Button showLoader color={"#fff"} width={"328px"} />
+        ) : (
+          <Button
+            type="submit"
+            labelName={"Sign up"}
+            color={"#fff"}
+            width={328}
+            disabled={loading}
+          ></Button>
+        )}
         <div className="auth-text">
           Already have an account?{" "}
           <a className="forgot-signup-link" href={"/login"}>

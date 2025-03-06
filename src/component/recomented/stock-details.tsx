@@ -26,6 +26,7 @@ export default function StockDetail({ stock }: StockDetailProps) {
   const isPositive = stock.percentChange > 0;
   const navigate = useNavigate();
   const chartRef = useRef<HTMLCanvasElement>(null);
+  const [loader, setloader] = useState<any>(false);
   const [sellQuantity, setSellQuantity] = useState(1);
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
 
@@ -47,27 +48,27 @@ export default function StockDetail({ stock }: StockDetailProps) {
   const handlebuy = (val: any) => {
     const valid = isTokenExpired(localStorage.getItem("token"));
     if (valid) {
-      navigate('/login')
+      navigate("/login");
     } else {
-      setIsSellModalOpen(true); 
+      setIsSellModalOpen(true);
     }
-   
   };
   const handlebuyStock = (val?: any) => {
+    setloader(true);
     updateStockStatus(
       localStorage.getItem("mail") || "",
       val?.symbol,
       "Buy",
       Math.round(Number(stock?.price)),
       sellQuantity
-    );
+    ).then(() => {
+      setIsSellModalOpen(false);
+      setloader(false);
+    });
   };
   const closebuyModal = () => {
     setIsSellModalOpen(false);
   };
-  {
-    console.log(isSellModalOpen, "isSellModalOpenisSellModalOpen", stock);
-  }
   useEffect(() => {
     if (chartRef.current) {
       const ctx = chartRef.current.getContext("2d");
@@ -304,16 +305,23 @@ export default function StockDetail({ stock }: StockDetailProps) {
             </div>
 
             <div className="modal-actions">
-              <Button
-                labelName={"cancel"}
-                color={"#1d3d60"}
-                backgroundColor={"#fff"}
-                onClick={closebuyModal}
-              ></Button>
-              <Button
-                labelName={"Buy"}
-                onClick={() => handlebuyStock(stock || "")}
-              ></Button>
+              {loader ? (
+                <Button showLoader color={"#fff"} width={"150px"} />
+              ) : (
+                <>
+                  <Button
+                    labelName={"cancel"}
+                    color={"#1d3d60"}
+                    backgroundColor={"#fff"}
+                    onClick={closebuyModal}
+                  ></Button>
+
+                  <Button
+                    labelName={"Buy"}
+                    onClick={() => handlebuyStock(stock || "")}
+                  ></Button>
+                </>
+              )}
             </div>
           </div>
         </div>

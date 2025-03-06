@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import "./LoginScreen.css";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../UIkit/Logo/logo";
+import { notify } from "../../UIkit/Toast/toast";
 import Button from "../../UIkit/Button/Button";
 import AWS from "aws-sdk";
 interface FormData {
@@ -38,6 +39,7 @@ const LoginScreen: React.FC = () => {
     password: "",
   });
   const [errors, setErrors] = useState<Errors>({});
+  const [loader, setloader] = useState<any>(false);
   const [touched, setTouched] = useState<{
     username: boolean;
     password: boolean;
@@ -98,13 +100,14 @@ const LoginScreen: React.FC = () => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    setloader(true);
     e.preventDefault();
     setTouched({ username: true, password: true, usermail: true });
 
     if (validateForm()) {
       try {
         const secretHash = await computeSecretHash(
-          "man",
+          formData.username,
           poolData.ClientId,
           poolData.clientScreate
         );
@@ -118,7 +121,6 @@ const LoginScreen: React.FC = () => {
           },
         };
         const result = await cognito.initiateAuth(params).promise();
-        console.log(result, "resultresultresultresult");
         localStorage.setItem(
           "token",
           result.AuthenticationResult?.IdToken || ""
@@ -126,9 +128,14 @@ const LoginScreen: React.FC = () => {
         localStorage.setItem("username", formData.username || "");
         localStorage.setItem("mail", formData.usermail || "");
         navigation("/");
+        setloader(false);
       } catch (error: any) {
+        notify(error.message, "error", 3000);
+        setloader(false);
         console.error("Login failed:", error.message);
       }
+    } else {
+      setloader(false);
     }
   };
 
@@ -189,7 +196,23 @@ const LoginScreen: React.FC = () => {
         {touched.password && errors.password && (
           <span className="error">{errors.password}</span>
         )}
-        <Button labelName={"Log in"} onClick={handleSubmit} width={"328px"} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row", 
+            alignItems: "center",
+          }}
+        >
+          {loader ? (
+            <Button showLoader color={"#fff"} width={"328px"} />
+          ) : (
+            <Button
+              labelName={"Log in"}
+              onClick={handleSubmit}
+              width={"328px"}
+            />
+          )}
+        </div>
         <div className="auth-text">
           Don't have an account?
           <a className="forgot-signup-link" href={"/signup"}>
