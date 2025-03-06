@@ -138,22 +138,7 @@ export default function StockPortfolio() {
     setBoughtStocks(updatedBoughtStocks);
     setSoldStocks([...soldStocks, soldStock]);
     closeSellModal();
-  };
-
-  //   {
-  //     "Price": 66,
-  //     "Quantity": 2,
-  //     "StockID": "BURNPUR",
-  //     "Category": "Buy",
-  //     "Email": "man@yopmail.com"
-  // },
-  // {
-  //     "Price": 776,
-  //     "Quantity": 3,
-  //     "StockID": "MANINDS",
-  //     "Category": "Buy",
-  //     "Email": "man@yopmail.com"
-  // }
+  }; 
 
   const currenttabdata = () => {
     if (activeTab === "sold") {
@@ -176,6 +161,7 @@ export default function StockPortfolio() {
       Math.round(Number(selectedStock?.Price)),
       sellQuantity
     ).then(() => {
+      dispatch(fetchBuyandSellStockData(""));
       setIsSellModalOpen(false);
       setloader(false);
     });
